@@ -87,7 +87,7 @@ public class MenuPrincipal extends JFrame {
         agregarBotonAcceso(panelAccesos, "Generar Planilla", "💰", new Color(155, 89, 182));
         agregarBotonAcceso(panelAccesos, "Reportes", "📊", new Color(230, 126, 34));
         agregarBotonAcceso(panelAccesos, "Gestión Personal", "👥", new Color(26, 188, 156));
-        agregarBotonAcceso(panelAccesos, "Configuración", "⚙️", new Color(149, 165, 166));
+        agregarBotonAcceso(panelAccesos, "Configuración", "🔧️", new Color(149, 165, 166));
         
         panelPrincipal.add(panelBienvenida, BorderLayout.NORTH);
         panelPrincipal.add(panelAccesos, BorderLayout.CENTER);
@@ -117,6 +117,36 @@ public class MenuPrincipal extends JFrame {
     }
     
     private void abrirVentanaSegunBoton(String texto) {
+        int rol = usuarioActual.getIdRol();
+        // Validar acceso según rol antes de abrir
+        boolean tieneAcceso = false;
+
+        switch (texto) {
+            case "Registrar Asistencia":
+            case "Consultar Asistencia":
+                // Todos los roles pueden ver asistencia
+                tieneAcceso = true;
+                break;
+            case "Generar Planilla":
+            case "Reportes":
+                // Solo RRHH (2) y Administrador (1)
+                tieneAcceso = (rol == 1 || rol == 2);
+                break;
+            case "Gestión Personal":
+            case "Configuración":
+                // Solo Administrador (1)
+                tieneAcceso = (rol == 1);
+                break;
+        }
+        if (!tieneAcceso) {
+            JOptionPane.showMessageDialog(this,
+                    "No tiene permisos para acceder a este módulo.",
+                    "Acceso denegado",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Si tiene acceso, abrir la ventana correspondiente
         switch (texto) {
             case "Registrar Asistencia":
                 abrirRegistroAsistencia();
