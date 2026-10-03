@@ -120,10 +120,11 @@ public class ControladorAsistencia {
             Time horaSalida = new Time(System.currentTimeMillis());
             
             // Calcular minutos extras (simplificado)
-            long horaEntradaMs = asistencia.getHoraEntrada().getTime();
-            long horaSalidaMs = horaSalida.getTime();
-            long horasTrabajadasMs = horaSalidaMs - horaEntradaMs;
-            int minutosExtras = (int) ((horasTrabajadasMs / (1000 * 60)) - 540); // 540 min = 9 horas
+            // Se restan solo las horas del día (la hora guardada en BD no trae fecha)
+            long minutosTrabajados = java.time.Duration.between(
+                asistencia.getHoraEntrada().toLocalTime(),
+                horaSalida.toLocalTime()).toMinutes();
+            int minutosExtras = (int) (minutosTrabajados - 540); // 540 min = 9 horas
             minutosExtras = Math.max(0, minutosExtras);
             
             boolean resultado = asistenciaDAO.registrarSalida(
@@ -163,8 +164,7 @@ public class ControladorAsistencia {
         List<Asistencia> asistencias = asistenciaDAO.listarPorRangoFechas(fechaInicio, fechaFin);
         
         for (Asistencia asistencia : asistencias) {
-            Personal personal = personalDAO.buscarPorDni(
-                String.valueOf(asistencia.getIdPersonal()));
+            Personal personal = personalDAO.buscarPorId(asistencia.getIdPersonal());
             
             Object[] fila = {
                 asistencia.getIdAsistencia(),

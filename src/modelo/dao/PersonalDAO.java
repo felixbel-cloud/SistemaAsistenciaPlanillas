@@ -69,6 +69,37 @@ public class PersonalDAO {
         return listaPersonal;
     }
     
+    // Buscar personal por ID
+    public Personal buscarPorId(int idPersonal) {
+        Personal personal = null;
+        String sql = "SELECT * FROM personal WHERE id_personal = ?";
+        
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idPersonal);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    personal = new Personal();
+                    personal.setIdPersonal(rs.getInt("id_personal"));
+                    personal.setDni(rs.getString("dni"));
+                    personal.setNombres(rs.getString("nombres"));
+                    personal.setApellidos(rs.getString("apellidos"));
+                    personal.setTipoPersonal(rs.getString("tipo_personal"));
+                    personal.setCargo(rs.getString("cargo"));
+                    personal.setFechaContratacion(rs.getDate("fecha_contratacion"));
+                    personal.setSalarioBase(rs.getDouble("salario_base"));
+                    personal.setHorarioEntrada(rs.getString("horario_entrada"));
+                    personal.setHorarioSalida(rs.getString("horario_salida"));
+                    personal.setActivo(rs.getBoolean("activo"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar personal por ID: " + e.getMessage());
+        }
+        
+        return personal;
+    }
+    
     // Buscar personal por DNI
     public Personal buscarPorDni(String dni) {
         Personal personal = null;
